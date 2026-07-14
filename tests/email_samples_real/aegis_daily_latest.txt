@@ -1,0 +1,110 @@
+Morning Chris — Aegis here with your daily foundry read.
+
+Where things stand:
+  • projects: 47 projects tracked. Recently-active: Plane2d, ViperKernel, viper-claude, viper-state, MoeGUI, ArchivalMoe, GeneticFoundry, ViperNote, TestRepo999, TestRepoPush. Open tasks: 969.
+  • system: Services UP: gateway, llm_server, gateway_web, conductor, smoother, otg_serve, graduation, compactor, pull_leash, soak_driver, coding_soak, wakelock, warmkeep, arbiter, free_thought, memory_loop, memory_withdraw, foundry_miner. Aegis autonomy OFF (soak mode). Disk free 1600GB. Ollama UP, brain down.
+  • performance: Soak 1380 rounds (night-full). Fastest models (tok/s): h2o-danube3-500m-chat-GGUF=1.47, tinyllama:1.1b=0.94, granite3.1-moe:1b=0.91. Budget 4/5 user-LLM/hr.
+  • foundry: Game leaders: qwen2.5-coder:0.5b(132w), qwen2.5-coder:1.5b(109w), qwen2.5:1.5b(103w), granite3.1-moe:1b(97w). Certified gates: 3. Economy wallets: 17.
+
+Since yesterday:
+  • Moe gate: 7 pending, 29 approved, 0 rejected
+  • NMCT integrity: OK 28 sealed-valid, 397 unsealed, 0 tampered
+  • Correctness audit: OK 29 approved block(s) still pass their tests
+  • Soak foundry: 879 mined, 27 gated into the NMCT (all-time)
+
+Trust ledger:
+  • Ensemble trust — most trusted: moe 1.4667x (28W-0L), m1 1.4667x (28W-0L)
+  •   shifted since last report: moe ↑0.3, m1 ↑0.3
+
+Mail worth a look:
+  - Google Play <googleplay-noreply@google — Microsoft Word: Edit Documents subscription suspended due to payment i
+  - OpenAI <noreply@tm.openai.com> — Dont lose access to ChatGPT Plus
+  - OpenAI <noreply@tm.openai.com> — Final reminder: Your Plus access ends soon
+  - LinkedIn <security-noreply@linkedin.co — Christopher, please verify your new device
+  - Google <no-reply@accounts.google.com> — Security alert
+  - Google <noreply-accounts@google.com> — You shared some Google Account data with kimi.com
+  - Google One <googleone-noreply@google.c — Fix payment now to keep using Gemini in Pro
+  - Google Play <googleplay-noreply@google — Payment declined for Google One subscription
+
+I'll keep the soak running and the gate honest. Shout if you want me to change course.
+
+— Aegis
+
+============================================================
+# Viper Soak — Daily Check-in — 2026-07-14 05:01
+
+## 🟢 Health
+- **pull_leash**: UP (pid 40444, hb 4s ago)
+- **soak_driver**: UP (pid 40024, hb 271s ago)
+- **services**: ollama UP · brain_mcp down · gateway:8800 UP · moe:8765 UP
+
+## 🏆 Competition leaderboard
+| model | wins | rounds | win% |
+|---|---|---|---|
+| qwen2.5-coder:0.5b | 129 | 389 | 33% |
+| qwen2.5-coder:1.5b | 109 | 342 | 31% |
+| qwen2.5:1.5b | 102 | 203 | 50% |
+| granite3.1-moe:1b | 96 | 204 | 47% |
+| llama3.2:1b | 66 | 204 | 32% |
+| internlm2:1.8b | 57 | 143 | 39% |
+| gemma2:2b | 52 | 202 | 25% |
+| qwen2.5:0.5b | 51 | 203 | 25% |
+| exaone3.5:2.4b | 41 | 143 | 28% |
+| deepseek-r1:1.5b | 40 | 204 | 19% |
+| smollm2:1.7b | 34 | 203 | 16% |
+| tinyllama:1.1b | 30 | 202 | 14% |
+| hf.co/bartowski/Qwen2.5-Math-1.5B-Instruct-GGUF | 26 | 125 | 20% |
+| agent:FORGE-granit1bxgemma22b | 24 | 103 | 23% |
+| stablelm2:1.6b | 22 | 143 | 15% |
+
+**Arena champions:** decision→qwen2.5-coder:0.5b · code_add→granite3.1-moe:1b · code_prime→qwen2.5-coder:1.5b · compare→qwen2.5:0.5b · docs→qwen2.5:0.5b · code_rev→llama3.2:1b · code_fib→granite3.1-moe:1b · compare3→qwen2.5-coder:1.5b · compare_dec→qwen2.5-coder:0.5b · math_add→qwen2.5-coder:1.5b · math_mul→qwen2.5:1.5b · reason→qwen2.5-coder:1.5b · decision_neg→qwen2.5-coder:0.5b · json_kv→qwen2.5-coder:0.5b · instruct→qwen2.5-coder:0.5b
+
+## Foundry & Trust
+- Soak foundry: 717 mined, 27 gated into the NMCT (all-time)
+- NMCT integrity: OK — 28 sealed-valid, 397 unsealed, 0 tampered
+- Correctness audit: OK — 29 approved block(s) still pass their tests
+- Strategy ledger: 3 strategies, 1324 trials · best: mine/lean (0.4322)
+- Agent fitness: 22 agents ranked · best qwen2.5:1.5b (fit 0.5392, win 0.51, 0.27 tok/s, 100 trials)
+
+## 🥋 DMAIC belts + inconsistencies
+- **21** models hold ≥1 black belt
+- **18 logical inconsistencies** → gated Improve suggestions:
+  - deepseek-r1:1.5b: incomplete (code) → **edit schema/cache**
+  - deepseek-r1:1.5b: incomplete (comparison) → **edit schema/cache**
+  - deepseek-r1:1.5b: incomplete (decision) → **edit schema/cache**
+  - deepseek-r1:1.5b: incomplete (docs) → **edit schema/cache**
+  - deepseek-r1:1.5b: incomplete (format) → **edit schema/cache**
+  - deepseek-r1:1.5b: incomplete (instruction) → **edit schema/cache**
+  - granite3-guardian:2b: non_monotone (decision) → **add wrapper**
+  - granite3.1-moe:1b: non_monotone (comparison) → **add wrapper**
+- **37 DMAIC suggestions pending your approval** in Moe's queue
+
+## 🧠 Model behaviors learned (last 24h)
+- **636** new observations logged in the last 24h; **0** models now have observed (not just seed) profiles.
+  - danube: [game:code_rev] WON in 12.36s :: To reverse a string in Python, you can use the 
+  - danube: [game:code_rev] WON in 16.87s :: To reverse a string in Python, you can use the 
+  - danube: [game:decision] WON in 8.67s :: Yes, 10 is greater than
+  - danube: [game:instruct] WON in 9.71s :: Fix it: "Replace the missing or incorrect elemen
+  - deepseek-r1:1.5b: [game:compare3] WON in 72.87s :: To determine the **largest** number among **42*
+  - deepseek-r1:1.5b: [game:compare3] WON in 83.85s :: To determine the **largest** number among **42*
+  - deepseek-r1:1.5b: [game:compare] WON in 58.47s :: To determine which number is larger between **17
+  - deepseek-r1:1.5b: [game:compare] WON in 62.48s :: To determine which number is larger between **17
+
+## 🎓 Graduation gate
+- ✅ **search** score 1.0 (2/2)
+- ✅ **tool** score 1.0 (2/2)
+- ✅ **prompt** score 1.0 (2/2)
+- ✅ **llm** score 1.0 (3/3)
+
+## ⚙️ Swarm ops
+- **pull-leash**: queue 0 · warm None · quarantine {}
+- **soak**: 1359 rounds done · arena idx 12 · recent: 04:57:16 decision_neg: qwen2.5-coder:0.5b  [qwen2.5-coder,qwen2.5-coder,qwen2.5]
+
+## 🗄️ Data guardian
+- **headroom**: 1600.5 GB free · telemetry.db 45.94 MB · all DBs 1087.9 MB
+- **growth**: 70.68 MB/day · days-to-disk-full: 23189.4
+- ⚠️ over-cap logs (prunable): ['watchdog_health', 'depin_ledger']
+- **policy audit**: OK — every growing table has a policy
+
+## ⚠️ Attention
+- nothing needs you right now ✅

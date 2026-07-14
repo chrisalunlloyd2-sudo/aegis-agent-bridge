@@ -23,31 +23,55 @@ def get_env():
     }
 
 
-def fetch_unread(cfg: dict) -> List[dict]:
+def _build_subject_query(subjects: list) -> str:
+    """Build nested IMAP OR query for multiple subjects."""
+    if len(subjects) == 1:
+        return f'SUBJECT "{subjects[0]}"'
+    query = f'SUBJECT "{subjects[-1]}"'
+    for subj in reversed(subjects[:-1]):
+        query = f'(OR SUBJECT "{subj}" {query})'
+    return query
+
+
+def _build_search_query(since_days: int, subjects: list) -> str:
+    from datetime import datetime, timedelta, timezone
+    since = (datetime.now(timezone.utc) - timedelta(days=since_days)).strftime("%d-%b-%Y")
+    return f'(SINCE {since} {_build_subject_query(subjects)})'
+
+
+def fetch_recent(cfg: dict, since_days: int = 3, limit: int = 50, peek: bool = True) -> List[dict]:
     context = ssl.create_default_context()
-    with imaplib.IMAP4_SSL(cfg["imap_host"], cfg["imap_port"], ssl_context=context) as mail:
+    with imaplib.IMAP4_SSL(cfg["imap_host"], cfg["imap_port"], ssl_context=context, timeout=15) as mail:
         mail.login(cfg["email"], cfg["password"])
         mail.select("inbox")
-        status, data = mail.search(None, "UNSEEN")
-        uids = data[0].split()
+        subjects = ["Aegis", "Nightly Dream", "kai collective"]
+        query = _build_search_query(since_days, subjects)
+        print(f"IMAP query: {query}")
+        status, data = mail.search(None, query)
+        uids = data[0].split()[-limit:]
         messages = []
+        fetch_spec = "(BODY.PEEK[])" if peek else "(RFC822)"
         for uid in uids:
-            status, msg_data = mail.fetch(uid, "(RFC822)")
-            raw = msg_data[0][1]
-            msg = email.message_from_bytes(raw)
-            subject = msg["Subject"] or ""
-            body = ""
-            if msg.is_multipart():
-                for part in msg.walk():
-                    ctype = part.get_content_type()
-                    if ctype == "text/plain":
-                        body = part.get_payload(decode=True).decode("utf-8", errors="ignore")
-                        break
-            else:
-                body = msg.get_payload(decode=True).decode("utf-8", errors="ignore") if msg.get_payload(decode=True) else ""
-            messages.append({"uid": uid.decode(), "subject": subject, "body": body, "date": msg["Date"]})
+            try:
+                status, msg_data = mail.fetch(uid, fetch_spec)
+                raw = msg_data[0][1]
+                msg = email.message_from_bytes(raw)
+                subject = str(msg.get("Subject", ""))
+                body = ""
+                if msg.is_multipart():
+                    for part in msg.walk():
+                        ctype = part.get_content_type()
+                        if ctype == "text/plain":
+                            payload = part.get_payload(decode=True)
+                            body = payload.decode("utf-8", errors="ignore") if payload else ""
+                            break
+                else:
+                    payload = msg.get_payload(decode=True)
+                    body = payload.decode("utf-8", errors="ignore") if payload else ""
+                messages.append({"uid": uid.decode(), "subject": subject, "body": body, "date": msg["Date"]})
+            except Exception as e:
+                print(f"WARN: failed to fetch UID {uid.decode()}: {e}")
         return messages
-
 
 def classify_email(subject: str, body: str) -> List[dict]:
     results = []
@@ -66,6 +90,7 @@ def main():
     parser = argparse.ArgumentParser(description="Aegis Agent Bridge Inbox Poller")
     parser.add_argument("--once", action="store_true", help="Run one poll and exit")
     parser.add_argument("--state", default="state.json", help="State file path")
+    parser.add_argument("--dry-run", action="store_true", help="Do not write state; just log what would be processed")
     args = parser.parse_args()
 
     cfg = get_env()
@@ -73,12 +98,12 @@ def main():
         print("Set AEGIS_EMAIL and AEGIS_PASSWORD environment variables.")
         return 1
 
-    state = AgentState(args.state)
-    messages = fetch_unread(cfg)
-    print(f"Fetched {len(messages)} unread messages at {datetime.now(timezone.utc).isoformat()}")
+    state = AgentState(args.state) if not args.dry_run else None
+    messages = fetch_recent(cfg)
+    print(f"Fetched {len(messages)} recent messages at {datetime.now(timezone.utc).isoformat()}")
 
     for msg in messages:
-        if state.is_processed(msg["uid"]):
+        if state and state.is_processed(msg["uid"]):
             print(f"Skipping already processed UID {msg['uid']}")
             continue
         print(f"Processing: {msg['subject'][:80]}...")
@@ -87,13 +112,19 @@ def main():
             if r["type"] == "strict":
                 target = r["agent"] or "aegis"
                 print(f"  → route to {target} (salience={r['salience']:.2f}) action={r['message'].action}")
-                state.set_agent(target, "last_message", r["message"].message_id)
+                if state:
+                    state.set_agent(target, "last_message", r["message"].message_id)
             elif r["type"] == "daily":
                 print(f"  → daily report parsed: {r['report'].projects_count} projects, {r['report'].soak_rounds} soak rounds")
-                state.set_agent("aegis", "latest_daily_report", r["report"].__dict__)
-        state.mark_processed(msg["uid"])
+                if state:
+                    state.set_agent("aegis", "latest_daily_report", r["report"].__dict__)
+        if state:
+            state.mark_processed(msg["uid"])
 
-    print("Snapshot:", state.snapshot())
+    if state:
+        print("Snapshot:", state.snapshot())
+    else:
+        print("Dry run complete — no state written")
     return 0
 
 

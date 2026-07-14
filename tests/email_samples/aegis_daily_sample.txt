@@ -1,0 +1,68 @@
+Morning Chris — Aegis here with your daily foundry read.
+
+Where things stand:
+  • projects: 47 projects tracked. Recently-active: Plane2d, ViperKernel, viper-claude, viper-state, MoeGUI, ArchivalMoe, GeneticFoundry, ViperNote, TestRepo999, TestRepoPush. Open tasks: 969.
+  • system: Services UP: gateway, llm_server, gateway_web, conductor, smoother, otg_serve, graduation, compactor, pull_leash, soak_driver, coding_soak. Aegis autonomy OFF (soak mode). Disk free 1600GB. Ollama UP, brain down.
+  • performance: Soak 1380 rounds (night-full). Fastest models (tok/s): h2o-danube3-500m-chat-GGUF=1.47, tinyllama:1.1b=0.94, granite3.1-moe:1b=0.91. Budget 4/5 user-LLM/hr.
+  • foundry: Game leaders: qwen2.5-coder:0.5b(132w), qwen2.5-coder:1.5b(109w), qwen2.5:1.5b(103w), granite3.1-moe:1b(97w). Certified gates: 3. Economy wallets: 17.
+
+Since yesterday:
+  • Moe gate: 7 pending, 29 approved, 0 rejected
+  • NMCT integrity: OK 28 sealed-valid, 397 unsealed, 0 tampered
+  • Correctness audit: OK 29 approved block(s) still pass their tests
+  • Soak foundry: 879 mined, 27 gated into the NMCT (all-time)
+
+Trust ledger:
+  • Ensemble trust — most trusted: moe 1.4667x (28W-0L), m1 1.4667x (28W-0L)
+  • shifted since last report: moe ↑10.3, m1 ↑10.3
+
+Mail worth a look:
+  - Google Play <googleplay-noreply@google.com> — Microsoft Word subscription suspended
+  - OpenAI <noreply@tm.openai.com> — ChatGPT Plus ends soon
+
+I'll keep the soak running and the gate honest. Shout if you want me to change course.
+
+— Aegis
+
+================================================================================
+# Viper Soak — Daily Check-in — 2026-07-14 05:01
+
+## 🟢 Health
+- **pull_leash**: UP (pid 40444, hb 4s ago)
+- **soak_driver**: UP (pid 40024, hb 271s ago)
+- **services**: ollama UP · brain_mcp down · gateway:8800 UP · moe:8765 UP
+
+## 🏆 Competition leaderboard
+| model | wins | rounds | win% |
+|---|---|---|---|
+| qwen2.5-coder:0.5b | 129 | 389 | 33% |
+| qwen2.5-coder:1.5b | 109 | 342 | 31% |
+| qwen2.5:1.5b | 102 | 203 | 50% |
+
+## Foundry & Trust
+- Soak foundry: 717 mined, 27 gated into the NMCT (all-time)
+- NMCT integrity: OK — 28 sealed-valid, 397 unsealed, 0 tampered
+- Correctness audit: OK — 29 approved block(s) still pass their tests
+
+## 🥋 DMAIC belts + inconsistencies
+- **21** models hold ≥1 black belt
+- **18 logical inconsistencies** → gated Improve suggestions
+- **37 DMAIC suggestions pending your approval** in Moe's queue
+
+## 🧠 Model behaviors learned (last 24h)
+- **636** new observations logged in the last 24h
+
+## 🎓 Graduation gate
+- ✅ **search** score 1.0 (2/2)
+- ✅ **tool** score 1.0 (2/2)
+
+## ⚙️ Swarm ops
+- **pull-leash**: queue 0 · warm None · quarantine {}
+- **soak**: 1359 rounds done · arena idx 12
+
+## 🗄️ Data guardian
+- **headroom**: 1600.5 GB free · telemetry.db 45.94 MB · all DBs 1087.9 MB
+- **growth**: 70.68 MB/day · days-to-disk-full: 23189.4
+
+## ⚠️ Attention
+- nothing needs you right now ✅

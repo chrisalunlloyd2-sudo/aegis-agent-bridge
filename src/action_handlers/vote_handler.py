@@ -50,8 +50,13 @@ def handle_vote(message, state) -> VoteResult:
 
     # Evaluate if this vote triggers a growth decision
     tally = state.get_vote_tally(vote_id or "default")
+    if not tally:
+        return VoteResult(True, voter, choice, vote_id, "no tally yet")
+    # Determine winning repo from tally
+    from collections import Counter
+    winner = Counter(tally.values()).most_common(1)[0][0]
     policy = GrowthPolicy(state)
-    decision = policy.evaluate_repo_vote(choice, tally, sources=[reasoning or f"vote by {voter}"])
+    decision = policy.evaluate_repo_vote(winner, tally, sources=[reasoning or f"vote by {voter}"])
     if decision.allowed and decision.action == "pending":
         pending = policy.pending_decisions()
         execute_after = pending[-1].get("execute_after") if pending else ""

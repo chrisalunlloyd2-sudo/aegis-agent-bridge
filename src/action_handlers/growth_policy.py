@@ -106,6 +106,14 @@ class GrowthPolicy:
         if not self.can_add_repo_today():
             return GrowthDecision(False, "Daily repo limit reached", "none", repo_name)
 
+        # Avoid duplicate pending entries for the same repo
+        existing = [d for d in self.pending_decisions() if d.get("repo") == repo_name]
+        if existing:
+            # Merge new sources
+            existing[0].setdefault("sources", []).extend(sources)
+            self.state.save()
+            return GrowthDecision(True, f"Updated pending approval: {repo_name} ({for_repo}/{total} votes)", "pending", repo_name)
+
         # Place in pending for veto window
         self.add_pending_decision({
             "repo": repo_name,

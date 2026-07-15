@@ -1,0 +1,41 @@
+name: Aegis Analytics Generator
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC daily
+  workflow_dispatch:
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout living-ascii-art
+        uses: actions/checkout@v4
+        with:
+          repository: chrisalunlloyd2-sudo/living-ascii-art
+          path: living-ascii-art
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Load bridge state from repo
+        run: |
+          if [ -f bridge_state.json ]; then
+            cp bridge_state.json state.json
+          elif [ -f state.json ]; then
+            echo "state.json already present"
+          fi
+      - name: Generate analytics
+        run: PYTHONPATH=. python3 scripts/generate_analytics.py
+      - name: Commit analytics to living-ascii-art
+        run: |
+          set -e
+          cd living-ascii-art
+          git config user.name "Aegis"
+          git config user.email "chrisalunlloyd2@gmail.com"
+          git add analytics/analytics.json
+          git diff --cached --quiet || (git commit -m "auto: daily analytics update" && git push)

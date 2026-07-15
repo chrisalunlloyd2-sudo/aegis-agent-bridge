@@ -20,24 +20,16 @@ jobs:
         env:
           AEGIS_EMAIL: ${{ secrets.AEGIS_EMAIL }}
           AEGIS_PASSWORD: ${{ secrets.AEGIS_PASSWORD }}
-      - name: Commit bridge state to living-ascii-art
+      - name: Commit bridge state
         run: |
           set -e
           python3 - <<'PY'
           import json, os
-          if not os.path.exists('state.json'):
+          if os.path.exists('state.json'):
+              with open('state.json') as f:
+                  state = json.load(f)
+              with open('bridge_state.json', 'w') as f:
+                  json.dump(state, f, indent=2)
+              print('wrote bridge_state.json')
+          else:
               print('No state.json generated')
-              exit(0)
-          with open('state.json') as f:
-              state = json.load(f)
-          # sanitize if needed
-          with open('bridge_state.json', 'w') as f:
-              json.dump(state, f, indent=2)
-          print('wrote bridge_state.json')
-          PY
-          if [ -f bridge_state.json ]; then
-            git config user.name "Aegis"
-            git config user.email "chrisalunlloyd2@gmail.com"
-            git add bridge_state.json
-            git diff --cached --quiet || (git commit -m "auto: update bridge_state.json from inbox poll" && git push origin main)
-          fi

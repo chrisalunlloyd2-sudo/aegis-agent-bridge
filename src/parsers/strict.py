@@ -1,7 +1,7 @@
 """Parse strict Aegis JSON-over-email protocol blocks."""
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 JSON_START = "===AEGIS_JSON_START==="
@@ -21,6 +21,8 @@ class ParsedMessage:
     expires_at: Optional[str]
     payload: dict
     raw_json: dict
+    raw_body: str = ""
+    params: dict = field(default_factory=dict)
 
 
 def extract_subject_tags(subject: str) -> tuple[List[str], Optional[str]]:
@@ -57,13 +59,16 @@ def extract_json_blocks(body: str) -> List[dict]:
     return results
 
 
-def parse_email(subject: str, body: str) -> List[ParsedMessage]:
+def parse_email(subject: str, body: str, raw_body: str = None) -> List[ParsedMessage]:
     """Parse one email into zero or more protocol messages."""
     subject_tags, subject_agent = extract_subject_tags(subject)
     blocks = extract_json_blocks(body)
     messages = []
     for block in blocks:
         agent_to = block.get("to_agent") or subject_agent
+        params = block.get("params", {})
+        if not isinstance(params, dict):
+            params = {}
         messages.append(
             ParsedMessage(
                 subject_tags=subject_tags,
@@ -77,6 +82,8 @@ def parse_email(subject: str, body: str) -> List[ParsedMessage]:
                 expires_at=block.get("expires_at"),
                 payload=block.get("payload", {}),
                 raw_json=block,
+                raw_body=raw_body or body,
+                params=params,
             )
         )
     return messages

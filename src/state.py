@@ -41,3 +41,39 @@ class AgentState:
 
     def snapshot(self) -> Dict[str, Any]:
         return {"state_path": self.path, "agents": list(self.data.get("agents", {}).keys()), "processed_count": len(self.data.get("processed_ids", []))}
+
+
+    def record_vote(self, vote_id: str, voter: str, choice: str, reasoning: str = ""):
+        """Record an authorized agent vote. Tally is stored under agent state."""
+        if "votes" not in self.data:
+            self.data["votes"] = {}
+        if vote_id not in self.data["votes"]:
+            self.data["votes"][vote_id] = {"tally": {}, "voters": {}, "reasoning": {}}
+        tally = self.data["votes"][vote_id]
+        if voter in tally["voters"]:
+            return {"status": "already_voted", "voter": voter}
+        tally["voters"][voter] = choice
+        tally["tally"][choice] = tally["tally"].get(choice, 0) + 1
+        if reasoning:
+            tally["reasoning"][voter] = reasoning
+        self.save()
+        return {"status": "recorded", "voter": voter, "choice": choice, "tally": tally["tally"]}
+
+    def get_vote_winner(self, vote_id: str) -> tuple:
+        tally = self.data.get("votes", {}).get(vote_id, {}).get("tally", {})
+        if not tally:
+            return None, tally
+        winner = max(tally, key=tally.get)
+        return winner, tally
+
+    def get_vote_tally(self, vote_id: str) -> dict:
+        return self.data.get("votes", {}).get(vote_id, {}).get("voters", {})
+
+
+    def append_agent_task(self, agent: str, task: dict):
+        if "tasks" not in self.data:
+            self.data["tasks"] = {}
+        if agent not in self.data["tasks"]:
+            self.data["tasks"][agent] = []
+        self.data["tasks"][agent].append(task)
+        self.save()

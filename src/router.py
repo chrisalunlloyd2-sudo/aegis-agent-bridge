@@ -44,3 +44,21 @@ def salience(message: ParsedMessage, alert_count_30d: int = 0, user_priority: fl
     if message.action in ("rollback", "blocked", "debug"):
         priority += 2
     return priority + tau
+
+
+
+def tally_votes(messages: list) -> dict:
+    counts = {}
+    for m in messages:
+        if m.action == "VOTE":
+            choice = m.params.get("choice", "unknown")
+            counts[choice] = counts.get(choice, 0) + 1
+    return counts
+
+
+def daily_flex_winner(messages: list) -> tuple:
+    counts = tally_votes(messages)
+    if not counts:
+        return None, counts
+    winner = max(counts, key=counts.get)
+    return winner, counts

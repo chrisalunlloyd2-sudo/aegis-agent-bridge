@@ -12,6 +12,7 @@ from parsers.strict import parse_email
 from parsers.daily import parse_daily_email
 from router import route, salience
 from state import AgentState
+from action_handlers import handle_vote
 
 
 def get_env():
@@ -73,16 +74,19 @@ def fetch_recent(cfg: dict, since_days: int = 3, limit: int = 50, peek: bool = T
                 print(f"WARN: failed to fetch UID {uid.decode()}: {e}")
         return messages
 
-def classify_email(subject: str, body: str) -> List[dict]:
+def classify_email(subject: str, body: str, raw_body: str = None) -> List[dict]:
     results = []
     # Strict protocol messages
-    strict_messages = parse_email(subject, body)
+    strict_messages = parse_email(subject, body, raw_body)
     for m in strict_messages:
         results.append({"type": "strict", "agent": route(m), "salience": salience(m), "message": m})
     # Daily report (heuristic: contains signature header)
     if "Morning Chris — Aegis here with your daily foundry read" in body or "Viper Soak — Daily Check-in" in body:
-        report = parse_daily_email(body)
-        results.append({"type": "daily", "report": report})
+        try:
+            report = parse_daily_email(body)
+            results.append({"type": "daily", "report": report})
+        except Exception as e:
+            print(f"WARN: daily parser failed: {e}")
     return results
 
 
@@ -111,9 +115,15 @@ def main():
         for r in results:
             if r["type"] == "strict":
                 target = r["agent"] or "aegis"
-                print(f"  → route to {target} (salience={r['salience']:.2f}) action={r['message'].action}")
+                action = r["message"].action
+                print(f"  → route to {target} (salience={r['salience']:.2f}) action={action}")
                 if state:
                     state.set_agent(target, "last_message", r["message"].message_id)
+                    if action == "VOTE":
+                        vote_result = handle_vote(r["message"], state)
+                        print(f"      vote result: authorized={vote_result.authorized}, voter={vote_result.voter}, choice={vote_result.choice}, error={vote_result.error}")
+                    elif action == "TASK":
+                        state.append_agent_task(target, r["message"].params)
             elif r["type"] == "daily":
                 print(f"  → daily report parsed: {r['report'].projects_count} projects, {r['report'].soak_rounds} soak rounds")
                 if state:

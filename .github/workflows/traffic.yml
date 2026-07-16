@@ -15,12 +15,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Fetch traffic from Cloudflare
+      - name: Fetch traffic (Cloudflare primary, GitHub fallback)
         run: python3 scripts/fetch_traffic.py
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_SITE_TAG: ${{ secrets.CLOUDFLARE_SITE_TAG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: chrisalunlloyd2-sudo/living-ascii-art
       - name: Commit traffic.json
         run: |
           set -e

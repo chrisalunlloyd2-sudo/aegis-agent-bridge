@@ -22,13 +22,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
-      - name: Load bridge state from repo
+      - name: Ensure fresh bridge state and traffic
         run: |
-          if [ -f bridge_state.json ]; then
-            cp bridge_state.json state.json
-          elif [ -f state.json ]; then
-            echo "state.json already present"
-          fi
+          # Use committed bridge_state.json as state input
+          if [ -f bridge_state.json ]; then cp bridge_state.json state.json; fi
       - name: Generate analytics
         run: PYTHONPATH=. python3 scripts/generate_analytics.py
       - name: Commit analytics to living-ascii-art

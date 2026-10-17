@@ -5,6 +5,7 @@ import email
 import imaplib
 import os
 import ssl
+import time
 from datetime import datetime, timezone
 from typing import List
 
@@ -40,9 +41,22 @@ def _build_search_query(since_days: int, subjects: list) -> str:
     return f'(SINCE {since} {_build_subject_query(subjects)})'
 
 
-def fetch_recent(cfg: dict, since_days: int = 3, limit: int = 50, peek: bool = True) -> List[dict]:
+def fetch_recent(cfg: dict, since_days: int = 3, limit: int = 50, peek: bool = True, attempts: int = 3) -> List[dict]:
+    """Fetch recent messages, retrying on transient network errors."""
+    for attempt in range(1, attempts + 1):
+        try:
+            return _fetch_recent_once(cfg, since_days, limit, peek)
+        except (OSError, imaplib.IMAP4.abort) as e:
+            if attempt == attempts:
+                raise
+            delay = 5 * attempt
+            print(f"WARN: IMAP attempt {attempt}/{attempts} failed ({e!r}); retrying in {delay}s")
+            time.sleep(delay)
+
+
+def _fetch_recent_once(cfg: dict, since_days: int, limit: int, peek: bool) -> List[dict]:
     context = ssl.create_default_context()
-    with imaplib.IMAP4_SSL(cfg["imap_host"], cfg["imap_port"], ssl_context=context, timeout=15) as mail:
+    with imaplib.IMAP4_SSL(cfg["imap_host"], cfg["imap_port"], ssl_context=context, timeout=30) as mail:
         mail.login(cfg["email"], cfg["password"])
         mail.select("inbox")
         subjects = ["Aegis", "Nightly Dream", "kai collective"]
